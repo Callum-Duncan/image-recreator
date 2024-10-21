@@ -1,7 +1,7 @@
 
 # Image recreator
 
-Recreate images using a collection of smaller images
+Recreate images using a collection of smaller images also know as `image to emoji`, `image Mosaics`, `image recreator`
 
 ![output_img](https://github.com/user-attachments/assets/3aef4594-9e2f-4811-8c45-6ced61318b2d)
 
