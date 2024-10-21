@@ -3,7 +3,7 @@
 
 Recreate images using a collection of smaller images
 
-![output_img](https://github.com/user-attachments/assets/3badbbc9-cd7b-4d2b-b6d6-42d7e20c00e2)
+![output_img](https://github.com/user-attachments/assets/3aef4594-9e2f-4811-8c45-6ced61318b2d)
 
 ## Installation
 
