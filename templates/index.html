@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Image Processor</h1>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <div class="file has-name is-fullwidth">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="file">
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">
+                                Choose a file…
+                            </span>
+                        </span>
+                        <span class="file-name">
+                            No file uploaded
+                        </span>
+                    </label>
+                </div>
+                <button class="button is-primary is-fullwidth" type="submit">Upload</button>
+            </form>
+            <hr>
+            <h2 class="subtitle">Settings</h2>
+            <form>
+                <div class="field">
+                    <label class="label">Desired Width</label>
+                    <div class="control">
+                        <input class="input" type="number" name="desired_width" value="{{ config['desired_width'] }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Part Size</label>
+                    <div class="control">
+                        <input class="input" type="number" name="part_size" value="{{ config['part_size'] }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Max Threads</label>
+                    <div class="control">
+                        <input class="input" type="number" name="max_threads" value="{{ config['max_threads'] }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Output Image Width</label>
+                    <div class="control">
+                        <input class="input" type="number" name="Output_image_width" value="{{ config['Output_image_width'] }}">
+                    </div>
+                </div>
+                <button class="button is-primary is-fullwidth" type="submit">Save Settings</button>
+            </form>
+        </div>
+    </section>
+</body>
+</html>
