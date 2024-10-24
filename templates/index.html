@@ -4,61 +4,262 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Processor</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .preview {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .preview .box {
+            width: 45%;
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            background-color: #f9f9f9;
+            overflow: hidden;
+            position: relative;
+        }
+        .preview .box h2 {
+            margin-bottom: 10px;
+            position: absolute;
+        }
+        .preview .box .content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            z-index: 1;
+            background-color: #000;
+        }
+        .preview img {
+            max-width: 100%;
+            max-height: 100%;
+            display: none;
+            z-index: 21;
+            transition: transform 0.3s ease;
+        }
+        .slider-container {
+            margin: 20px 0;
+        }
+        .drop-zone {
+            border: 2px dashed #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .drop-zone.dragover {
+            border-color: #000;
+        }
+        .loading-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .loading-bar div {
+            height: 10px;
+            background-color: #4caf50;
+            width: 0;
+        }
+        .download-button {
+            /* display: none; */
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <section class="section">
-        <div class="container">
-            <h1 class="title">Image Processor</h1>
-            <form action="/upload" method="post" enctype="multipart/form-data">
-                <div class="file has-name is-fullwidth">
-                    <label class="file-label">
-                        <input class="file-input" type="file" name="file">
-                        <span class="file-cta">
-                            <span class="file-icon">
-                                <i class="fas fa-upload"></i>
-                            </span>
-                            <span class="file-label">
-                                Choose a file…
-                            </span>
-                        </span>
-                        <span class="file-name">
-                            No file uploaded
-                        </span>
-                    </label>
-                </div>
-                <button class="button is-primary is-fullwidth" type="submit">Upload</button>
-            </form>
-            <hr>
-            <h2 class="subtitle">Settings</h2>
-            <form>
-                <div class="field">
-                    <label class="label">Desired Width</label>
-                    <div class="control">
-                        <input class="input" type="number" name="desired_width" value="{{ config['desired_width'] }}">
+    <div class="container markdown-body">
+        <h1>Image Processor</h1>
+        <form id="upload-form" method="post" enctype="multipart/form-data">
+            <div class="preview">
+                <div class="box">
+                    <div class="drop-zone" id="drop-zone">
+                        Drag & Drop your image here or click to upload
+                        <input type="file" name="file" accept="image/*" style="display: none;" required>
                     </div>
                 </div>
-                <div class="field">
-                    <label class="label">Part Size</label>
-                    <div class="control">
-                        <input class="input" type="number" name="part_size" value="{{ config['part_size'] }}">
-                    </div>
+                <div class="box">
+                    <h2>Output Image</h2>
+                    <img id="output_preview" src="#" alt="Output Image Preview">
                 </div>
-                <div class="field">
-                    <label class="label">Max Threads</label>
-                    <div class="control">
-                        <input class="input" type="number" name="max_threads" value="{{ config['max_threads'] }}">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Output Image Width</label>
-                    <div class="control">
-                        <input class="input" type="number" name="Output_image_width" value="{{ config['Output_image_width'] }}">
-                    </div>
-                </div>
-                <button class="button is-primary is-fullwidth" type="submit">Save Settings</button>
-            </form>
-        </div>
-    </section>
+            </div>
+            <div class="loading-bar" id="loading-bar">
+                <div></div>
+            </div>
+            <div class="slider-container">
+                <label for="desired_width">Desired Width: <span id="desired_width_value">9600</span></label>
+                <input type="range" id="desired_width" name="desired_width" min="256" max="8192" step="64" value="9600" oninput="updateSettings()">
+            </div>
+            <div class="slider-container">
+                <label for="output_image_width">Output Image Width: <span id="output_image_width_value">5000</span></label>
+                <input type="range" id="output_image_width" name="output_image_width" min="1024" max="11520" step="128" value="5000" oninput="updateSettings()">
+            </div>
+            <div class="slider-container">
+                <label for="part_size">Part Size: <span id="part_size_value">32</span></label>
+                <input type="range" id="part_size" name="part_size" min="8" max="56" step="8" value="32" oninput="updateSettings()">
+            </div>
+            <div class="slider-container">
+                <label for="max_threads">Max Threads: <span id="max_threads_value">5</span></label>
+                <input type="range" id="max_threads" name="max_threads" min="1" max="20" value="5" oninput="updateSettings()">
+            </div>
+            <input type="hidden" id="hidden_desired_width" name="hidden_desired_width" value="9600">
+            <input type="hidden" id="hidden_output_image_width" name="hidden_output_image_width" value="5000">
+            <input type="hidden" id="hidden_part_size" name="hidden_part_size" value="32">
+            <input type="hidden" id="hidden_max_threads" name="hidden_max_threads" value="5">
+            <button type="submit" style="display: none;">Upload and Process</button>
+        </form>
+        <button class="download-button" id="download-button">Download Output Image</button>
+    </div>
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = dropZone.querySelector('input[type="file"]');
+        const form = document.getElementById('upload-form');
+        const outputPreview = document.getElementById('output_preview');
+        const loadingBar = document.getElementById('loading-bar').firstElementChild;
+        const downloadButton = document.getElementById('download-button');
+        let updateTimeout;
+        let scale = 1;
+        let originX = 0.5;
+        let originY = 0.5;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+    
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) {
+                fileInput.files = files;
+                handleFileUpload(files[0]);
+            }
+        });
+    
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length) {
+                handleFileUpload(fileInput.files[0]);
+            }
+        });
+    
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            loadingBar.style.width = '0';
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    // Clear the old image by hiding it
+                    outputPreview.style.display = 'none';
+                    outputPreview.src = '';
+                    
+                    // Force refresh of new image by appending a timestamp
+                    const timestamp = new Date().getTime(); // Generate a unique timestamp
+                    outputPreview.src = `${data.output_image}?t=${timestamp}`;
+                    outputPreview.onload = () => {
+                        outputPreview.style.display = 'block';  // Show the new image after it has loaded
+                    };
+                    
+                    // Show download button
+                    downloadButton.style.display = 'block';
+                    downloadButton.href = `${data.output_image}?t=${timestamp}`;
+                    downloadButton.download = 'output_img.png';
+                }
+            })
+            .catch(error => console.error('Error:', error))
+            .finally(() => {
+                loadingBar.style.width = '100%';  // Fill loading bar once process is done
+            });
+        });
+
+        function updateSettings() {
+            // Clear the previous timeout
+            clearTimeout(updateTimeout);
+
+            // Update labels to reflect the current slider values
+            document.getElementById('desired_width_value').innerText = document.getElementById('desired_width').value;
+            document.getElementById('output_image_width_value').innerText = document.getElementById('output_image_width').value;
+            document.getElementById('part_size_value').innerText = document.getElementById('part_size').value;
+            document.getElementById('max_threads_value').innerText = document.getElementById('max_threads').value;
+
+            // Update hidden input fields with the current slider values
+            document.getElementById('hidden_desired_width').value = document.getElementById('desired_width').value;
+            document.getElementById('hidden_output_image_width').value = document.getElementById('output_image_width').value;
+            document.getElementById('hidden_part_size').value = document.getElementById('part_size').value;
+            document.getElementById('hidden_max_threads').value = document.getElementById('max_threads').value;
+
+            // Set a timeout to submit the form after a delay
+            updateTimeout = setTimeout(() => {
+                if (fileInput.files.length) {
+                    form.dispatchEvent(new Event('submit'));
+                }
+            }, 500); // 500ms delay
+        }
+
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                dropZone.style.backgroundImage = `url(${e.target.result})`;
+                dropZone.style.backgroundSize = 'contain';
+                dropZone.style.backgroundRepeat = 'no-repeat';
+                dropZone.style.backgroundPosition = 'center';
+            };
+            reader.readAsDataURL(file);
+    
+            // Clear the old image
+            outputPreview.src = '';
+            outputPreview.style.display = 'none';
+            downloadButton.style.display = 'none';
+    
+            form.dispatchEvent(new Event('submit'));
+        }
+
+        outputPreview.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = outputPreview.getBoundingClientRect();
+            const offsetX = e.clientX - rect.left;
+            const offsetY = e.clientY - rect.top;
+            const delta = Math.sign(e.deltaY) * -0.8;
+
+            scale = Math.min(Math.max(1, scale + delta), 45); // Limit zoom scale between 1 and 5
+            originX = offsetX / rect.width;
+            originY = offsetY / rect.height;
+
+            outputPreview.style.transformOrigin = `${originX * 100}% ${originY * 100}%`;
+            outputPreview.style.transform = `scale(${scale})`;
+        });
+    </script>
 </body>
 </html>
