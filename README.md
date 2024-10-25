@@ -30,6 +30,9 @@ https://code.cratior.me/image/
 | Finding Closest Matching Parts |                                 | 54000 [00:00] 194,946.05   it/s |
 | Placing Closest Parts          | 54000 [00:12] 497.53 it/s       | 54000 [00:00] 1,710,631.33   it/s |
 
+![Screenshot 2024-10-06 144130](https://github.com/user-attachments/assets/a187c125-3dfd-4a2d-a3c6-865e8d0b4d3a)
+The code works in O(n) with generationg speed constant and time to generate based of size in how many images will be placed in final image.
+
 # Image Settings Configuration
 
 ## Memory and Processing Requirements
