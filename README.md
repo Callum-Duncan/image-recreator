@@ -14,8 +14,10 @@ clone the repository
   cd image-recreator
   pip install -r requirements.txt
 ```
-Or try it online:
+Or try it **online**:
 https://code.cratior.me/image/
+
+(website wont always be up/active)
 
 # Optimizations
 `metrics from tqdm`
